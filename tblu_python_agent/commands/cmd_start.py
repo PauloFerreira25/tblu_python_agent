@@ -11,19 +11,23 @@ from tblu_python_agent.vo.metric import Metric
 @pass_context
 def cli(ctx, db):
     ctx.db.init(ctx=ctx, dbPath=db)
-    ctx.cron.init(ctx=ctx)
-    a = Metric('a', '* * * * *')
-    b = Metric('b', '* * * * *')
-    # metricas = ctx.db.getMetrics()
-    # for metrica in metricas:
-    ctx.cron.add(a)
-    ctx.cron.add(b)
-    # Carregar as Metricas do Banco
-    # Criar as crons para executar as metricas
-    try:
-        # This is here to simulate application activity (which keeps the main thread alive).
-        while True:
-            time.sleep(2)
-    except (KeyboardInterrupt, SystemExit):
-        # Not strictly necessary if daemonic mode is enabled but should be done if possible
-        ctx.cron.shutdown()
+    ctx.account = ctx.db.getProperties('account')
+    ctx.equipment = ctx.db.getProperties('equipment')
+    if ctx.account == None or ctx.equipment == None:
+        raise click.UsageError('Rode o configure atens')
+    else:
+        ctx.cron.init(ctx=ctx)
+        metricas = ctx.db.getMetrics()
+        print(metricas)
+        # a = Metric('a', '* * * * *')
+        # b = Metric('b', '* * * * *')
+        for metrica in metricas:
+            ctx.cron.add(metrica)
+        try:
+            # This is here to simulate application activity (which keeps the main thread alive).
+            while True:
+                time.sleep(2)
+        except (KeyboardInterrupt, SystemExit):
+            # Not strictly necessary if daemonic mode is enabled but should be done if possible
+            ctx.db.closeDB()
+            ctx.cron.shutdown()

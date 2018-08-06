@@ -38,15 +38,9 @@ class Cron():
                      "method": sys._getframe().f_code.co_name}
             logMSG = "Tick!{}, The time is: {}".format(metric, datetime.now())
             self.ctx.log.debug(logMSG, extra=extra)
-            if(metric._key == 'a'):
-                time.sleep(150)
-                logMSG = "Tick2!{}, The time is: {}".format(
-                    metric, datetime.now())
-                self.ctx.log.debug(logMSG, extra=extra)
-            else:
-                logMSG = "Tick2!{}, The time is: {}".format(
-                    metric, datetime.now())
-                self.ctx.log.debug(logMSG, extra=extra)
+            logMSG = "Tick2!{}, The time is: {}".format(
+                metric, datetime.now())
+            self.ctx.log.debug(logMSG, extra=extra)
         except Exception as identifier:
             logMSG = "Fail to Tick"
             self.ctx.log.exception(logMSG, error=identifier, extra=extra)

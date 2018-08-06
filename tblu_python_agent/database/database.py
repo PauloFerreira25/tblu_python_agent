@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import sqlite3
 import sys
-from tblu_python_agent.vo.metric import createTableMetric
+from tblu_python_agent.vo.metric import *
 
 
 class LocalDB():
@@ -35,7 +35,7 @@ class LocalDB():
         self.connTemp.commit()
 
     def checkDBData(self):
-        self.connData.cursor().execute(createTableMetric)
+        self.connData.cursor().execute(SQL_CREATE_TABLE_METRIC)
         self.connData.commit()
 
     def checkDB(self):
@@ -49,8 +49,43 @@ class LocalDB():
                 properties, value))
         self.connAgent.commit()
 
+    def getProperties(self, properties):
+        cur = self.connAgent.cursor()
+        p = cur.execute(
+            """SELECT value FROM config WHERE properties == ? LIMIT 1""", [properties]).fetchone()
+        cur.close()
+        if p == None:
+            return None
+        else:
+            return p[0]
+
+    def createDefaultMetrics(self):
+        extra = {"local": __name__, "method": sys._getframe().f_code.co_name}
+        cur = self.connData.cursor()
+        args = getMetricDefault(self.ctx.equipment)
+        logMSG = "Args {}".format(args)
+        self.ctx.log.debug(logMSG, extra=extra)
+        cur.executemany(SQL_INSERT_METRICS, args)
+        self.connAgent.commit()
+        return
+
+    def getMetrics(self):
+        cur = self.connData.cursor()
+        rows = cur.execute(SQL_GET_METRICS).fetchall()
+        result = []
+        if len(rows) <= 0:
+            self.createDefaultMetrics()
+            return self.getMetrics()
+        else:
+            for row in rows:
+                result.append(Metric(row))
+        cur.close()
+        return result
+
     def closeDB(self):
         self.connAgent.close()
+        self.connTemp.close()
+        self.connData.close()
 
     def dumpDB(self):
         self.dumpConfig()
