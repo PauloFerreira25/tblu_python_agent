@@ -7,10 +7,7 @@ import click
 import logging
 import click_log
 logger = click_log.basic_config(__name__)
-
 from .logger.logger import Logger
-from .database.database import LocalDB
-from .cron.cron import Cron
 
 CONTEXT_SETTINGS = dict(auto_envvar_prefix='COMPLEX')
 
@@ -20,14 +17,13 @@ class Context(object):
     def __init__(self):
         self.debug = False
         self.logLevel = 0
+        self.sharedModule = None
         self.log = Logger(logger)
-        self.db = LocalDB()
-        self.cron = Cron()
 
 
 pass_context = click.make_pass_decorator(Context, ensure=True)
-cmd_folder = os.path.abspath(os.path.join(os.path.dirname(__file__),
-                                          'commands'))
+cmd_folder = os.path.abspath(os.path.join(
+    os.path.dirname(__file__), 'commands'))
 
 
 class ComplexCLI(click.MultiCommand):
@@ -54,9 +50,6 @@ class ComplexCLI(click.MultiCommand):
 
 
 @click.command(cls=ComplexCLI, context_settings=CONTEXT_SETTINGS)
-# @click.option('--home', type=click.Path(exists=True, file_okay=False,
-#                                         resolve_path=True),
-#   help = 'Changes the folder to operate on.')
 @click.option('-v', '--verbose', default=0, count=True,
               help='Enables verbose mode.')
 @pass_context
@@ -66,10 +59,3 @@ def cli(ctx, verbose):
     ctx.logLevel = ctx.log.getLogLevel(str(verbose))
     if verbose >= 2:
         ctx.debug = True
-
-    # if home is not None:
-    #     ctx.home = home
-
-
-# if __name__ == "__main__":
-#     cli()
