@@ -20,6 +20,8 @@ def cli(ctx, db):
     if ctx.account == None or ctx.component == None:
         raise click.UsageError('Rode o configure atens')
     else:
+        if ctx.debug:
+            ctx.sharedModule.dumpConfig()
         ctx.sharedModule.runUpdate()
         ctx.sharedModule.startCrons()
         try:

@@ -3,7 +3,7 @@ import sys
 import click
 from uuid import UUID
 from tblu_python_agent.cli import pass_context
-from tblu_python_agent.shared_module.shared_module import SharedModule
+from ..shared_module.shared_module import SharedModule
 
 
 @click.command('configure', short_help='Configure this agent')

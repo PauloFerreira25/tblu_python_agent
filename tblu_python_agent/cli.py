@@ -18,6 +18,7 @@ class Context(object):
         self.debug = False
         self.logLevel = 0
         self.sharedModule = None
+        self.baseAPI = 'http://localhost:3000'
         self.log = Logger(logger)
 
 

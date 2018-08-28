@@ -12,6 +12,7 @@ import logging
 import click_log
 log1 = click_log.basic_config('apscheduler.executors.default')
 log2 = click_log.basic_config('apscheduler.scheduler')
+from .cron_executor import cron_run
 
 
 class CronController:
@@ -33,23 +34,21 @@ class CronController:
         self.start()
 
     def tick(self, metric):
+        extra = {"local": __name__,
+                 "method": sys._getframe().f_code.co_name}
         try:
-            extra = {"local": __name__,
-                     "method": sys._getframe().f_code.co_name}
             logMSG = "Tick!{}, The time is: {}".format(metric, datetime.now())
             self.ctx.log.debug(logMSG, extra=extra)
-            logMSG = "Tick2!{}, The time is: {}".format(
-                metric, datetime.now())
-            self.ctx.log.debug(logMSG, extra=extra)
+            cron_run(ctx=self.ctx, metric=metric)
         except Exception as identifier:
             logMSG = "Fail to Tick"
             self.ctx.log.exception(logMSG, error=identifier, extra=extra)
             raise
 
     def start(self):
+        extra = {"local": __name__,
+                 "method": sys._getframe().f_code.co_name}
         try:
-            extra = {"local": __name__,
-                     "method": sys._getframe().f_code.co_name}
             if self.scheduler.state != STATE_RUNNING:
                 logMSG = "Scheduler Start".format()
                 self.ctx.log.debug(logMSG, extra=extra)
@@ -60,9 +59,9 @@ class CronController:
             raise
 
     def add(self, metric):
+        extra = {"local": __name__,
+                 "method": sys._getframe().f_code.co_name}
         try:
-            extra = {"local": __name__,
-                     "method": sys._getframe().f_code.co_name}
             self.scheduler.add_job(self.tick,
                                    CronTrigger.from_crontab(metric.cron),
                                    args=[metric],

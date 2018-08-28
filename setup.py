@@ -12,7 +12,7 @@ with open('HISTORY.rst') as history_file:
     history = history_file.read()
 
 requirements = ['Click>=6.0', 'click-log>=0.3.2',
-                'apscheduler>=3.5.1', 'tblu_module_so>=0.1.2']
+                'apscheduler>=3.5.1', 'requests>=2.19.1', 'tblu_module_so>=0.1.2']
 
 setup_requirements = []
 

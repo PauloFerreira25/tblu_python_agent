@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from .metricas_adapter.metricas_adapter import MetricasAdapter
+from .coletas_adapter.coletas_adapter import ColetasAdapter
 from .metricas_padrao import MetricasPadrao
 from .cron_controller.cron_controller import CronController
 
@@ -10,7 +11,7 @@ class SharedModule:
         self.ctx = ctx
         self.cronController = CronController(ctx=ctx)
         self.metricasAdapter = MetricasAdapter(ctx=ctx, dbPath=dbPath)
-        # self.coletasAdapter = ColetasAdapter(ctx=ctx, dbPath=dbPath)
+        self.coletasAdapter = ColetasAdapter(ctx=ctx, dbPath=dbPath)
         # self.tempDataAdapter = TempDataAdapter(ctx=ctx, dbPath=dbPath)
 
     def insetProperties(self, properties, value):
@@ -18,9 +19,11 @@ class SharedModule:
 
     def dumpConfig(self):
         self.metricasAdapter.dumpConfig()
+        self.coletasAdapter.dumpConfig()
 
     def closeDB(self):
         self.metricasAdapter.closeDB()
+        self.coletasAdapter.closeDB()
 
     def shutdown(self):
         self.closeDB()
@@ -40,3 +43,6 @@ class SharedModule:
     def startCrons(self):
         for m in self.metricasAdapter.metricaDAO.getAll():
             self.cronController.add(m)
+
+    def insertColeta(self, coleta):
+        return self.coletasAdapter.coletaDAO.insert(coleta=coleta)
