@@ -15,21 +15,21 @@ log2 = click_log.basic_config('apscheduler.scheduler')
 
 
 class Cron():
+    executors = {
+        'default': ThreadPoolExecutor(20),
+        'processpool': ProcessPoolExecutor(5)
+    }
+    job_defaults = {
+        'coalesce': False,
+        'max_instances': 1
+    }
+    scheduler = BackgroundScheduler(executors=executors,
+                                    job_defaults=job_defaults)
 
     def init(self, ctx):
         self.ctx = ctx
         log1.setLevel(ctx.logLevel)
         log2.setLevel(ctx.logLevel)
-        self.executors = {
-            'default': ThreadPoolExecutor(20),
-            'processpool': ProcessPoolExecutor(5)
-        }
-        self.job_defaults = {
-            'coalesce': False,
-            'max_instances': 1
-        }
-        self.scheduler = BackgroundScheduler(executors=self.executors,
-                                             job_defaults=self.job_defaults)
         self.start()
 
     def tick(self, metric):
